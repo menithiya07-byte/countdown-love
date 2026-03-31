@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown 💖</title>
+
+<style>
+html, body {
+    margin:0;
+    padding:0;
+    font-family: Arial;
+    text-align:center;
+    color:white;
+}
+
+/* 🌌 STAR BACKGROUND */
+#countdownPage {
+    height:100vh;
+    background:black;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+}
+
+#countdownPage::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background:url('https://www.transparenttextures.com/patterns/stardust.png');
+    animation:moveStars 60s linear infinite;
+}
+
+@keyframes moveStars{
+    from{transform:translate(0,0);}
+    to{transform:translate(-500px,-500px);}
+}
+
+/* ✅ ensure content stays above background */
+#countdownPage > * {
+    position: relative;
+    z-index: 2;
+}
+
+#timer{
+    font-size:30px;
+    margin-bottom:20px;
+}
+
+#options button{
+    display:block;
+    margin:10px auto;
+    padding:10px 20px;
+    border-radius:20px;
+    border:none;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="countdownPage">
+<h1>Counting Down 💖</h1>
+<div id="timer"></div>
+
+<h3 id="question"></h3>
+<div id="options"></div>
+<p id="result"></p>
+</div>
+
+<script>
+
+/* 🎯 DATE */
+const targetDate = new Date("April 14, 2026 00:00:00").getTime();
+
+/* ⏳ COUNTDOWN */
+setInterval(()=>{
+let now = new Date().getTime();
+let d = targetDate - now;
+
+if(d <= 0){
+document.getElementById("timer").innerHTML = "🎉 It's the day! 💖";
+return;
+}
+
+let days = Math.floor(d/(1000*60*60*24));
+let h = Math.floor((d/(1000*60*60))%24);
+let m = Math.floor((d/(1000*60))%60);
+let s = Math.floor((d/1000)%60);
+
+document.getElementById("timer").innerHTML =
+`${days} Days ${h}h ${m}m ${s}s`;
+},1000);
+
+/* 💖 QUESTIONS */
+const questions = [
+    {
+        q: "What’s one memory you wish we could relive? ⏳",
+        options: ["First meet", "A long talk", "A laugh", "All memories"]
+    },
+    {
+        q: "When did you first realize you liked me? 😊",
+        options: ["First meeting", "After talking", "Random moment", "Still realizing"]
+    },
+    {
+        q: "What reminds you of me? 🌸",
+        options: ["Songs", "Places", "Memories", "Everything"]
+    },
+    {
+        q: "Do you ever feel a little possessive when it comes to me? 😌",
+        options: ["Yes", "Sometimes", "Rarely", "Never"]
+    },
+    {
+        q: "What kind of future do you imagine with me? ✨",
+        options: ["Peaceful life", "Adventurous life", "Fun-filled life", "Balanced life"]    
+    },
+    {
+        q: "What do you think makes us strong together? 💪❤️",
+        options: ["Trust", "Love", "Understanding", "Everything"]
+    },
+    {
+       q: "What kind of couple do you think we are? 😍",
+       options: ["Cute 🥰", "Strong 💪", "Fun 😂", "Perfect ❤️"]
+    },
+    {
+        q: "What do you admire most about me? 🌟",
+        options: ["My confidence", "My kindness", "My mindset", "My honesty"]
+    },
+    {
+        q: "If I were a song, what kind would I be? 🎶",
+        options: ["Romantic", "Calm", "Energetic", "Emotional"]
+    },
+    {
+        q: "Which moment with me do you replay in your mind? 🎞️",
+        options: ["First talk", "A funny moment", "A deep convo", "Every moment"]
+    },
+    {
+        q: "Who is your favourite celebrity couple? 💑",
+        options: ["Virat & Anushka", "Ajith & Shalini", "Ranbir & Alia", "Sid & Kiara"]
+    },
+    {
+        q: "Do you still have any secret that you are hiding from me? 🤫",
+        options: ["Yes, a small one","Maybe… not ready to tell yet","No, I’ve told you everything","I might tell you soon 😉"]
+    },
+    {
+       q: "What kind of wedding theme would you like for us? 💍",
+       options: ["Gold and Red ❤️✨","Pastel Theme 🌸","A Royal Traditional Style 👑","A Simple and Elegant Theme 🤍"]
+    },
+    {
+       q: "What kind of partner do you think I am? 💭",
+       options: ["Supportive", "Caring", "Fun-loving", "Understanding"]
+    }
+];
+
+/* 📅 DAILY STORAGE KEYS */
+const dateKey = new Date().toDateString();
+const answerKey = "answer_" + dateKey;
+
+/* LOAD */
+if(localStorage.getItem(answerKey)){
+    showSavedAnswer();
+}else{
+    loadQ();
+}
+
+function loadQ(){
+let i = new Date().getDate() % questions.length;
+let q = questions[i];
+
+document.getElementById("question").innerText = q.q;
+let optDiv = document.getElementById("options");
+optDiv.innerHTML = "";
+
+q.options.forEach(o=>{
+let b = document.createElement("button");
+b.innerText = o;
+b.onclick = ()=>check(o);
+optDiv.appendChild(b);
+});
+}
+
+function check(selected){
+localStorage.setItem(answerKey, JSON.stringify({selected}));
+showSavedAnswer();
+setTimeout(showMsg,500);
+}
+
+/* SHOW SAVED ANSWER */
+function showSavedAnswer(){
+let data = JSON.parse(localStorage.getItem(answerKey));
+
+let i = new Date().getDate() % questions.length;
+let q = questions[i];
+
+document.getElementById("question").innerText = q.q;
+let optDiv = document.getElementById("options");
+optDiv.innerHTML = "";
+
+q.options.forEach(o=>{
+let b = document.createElement("button");
+b.innerText = o;
+
+if(o === data.selected){
+    b.style.background="blue";
+}
+
+b.disabled = true;
+optDiv.appendChild(b);
+});
+}
+
+/* ⏰ TIME MESSAGE */
+function showMsg(){
+let h=new Date().getHours();
+let msg = h<11?"Good morning ☀️":
+          h<15?"Go have lunch 🍛":
+          h<19?"Relax 💖":
+          "Sleep well 😴";
+alert(msg);
+}
+
+</script>
+
+</body>
+</html>
